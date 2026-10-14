@@ -2,19 +2,27 @@
 
 ## 1. Descripción del proyecto
 
-Este proyecto consiste en la creación de una base de datos inicial para un sistema de ventas retail utilizando PostgreSQL.
+Este proyecto consiste en la creación de la estructura inicial de una base de datos para un sistema retail utilizando PostgreSQL.
 
-El objetivo es definir las tablas principales del sistema, establecer restricciones de integridad y realizar una carga inicial de datos mediante sentencias SQL.
+El objetivo es diseñar las tablas principales para gestionar clientes, productos y ventas, aplicar restricciones de integridad y realizar una carga inicial de datos de manera controlada.
 
-El proyecto incluye operaciones de creación de tablas (DDL), manipulación de datos (DML), transacciones y consultas de verificación.
+El proyecto utiliza sentencias SQL de definición de datos (DDL) y manipulación de datos (DML).
 
 ## 2. Tecnologías utilizadas
 
 - **PostgreSQL:** sistema de gestión de bases de datos relacionales.
-- **SQL:** lenguaje utilizado para crear las tablas, establecer restricciones y manipular los datos.
-- **GitHub:** plataforma utilizada para alojar y compartir el proyecto.
+- **SQL:** lenguaje utilizado para crear tablas, establecer restricciones y manipular datos.
+- **pgAdmin 4:** herramienta gráfica para administrar PostgreSQL y ejecutar consultas SQL.
+- **GitHub:** plataforma utilizada para alojar y compartir el código del proyecto.
 
-## 3. Estructura de la base de datos
+## 3. Estructura del repositorio
+
+El repositorio contiene los siguientes archivos:
+
+- `retail.sql`: script SQL con la creación de las tablas, las restricciones, la carga inicial de datos y las operaciones de mantenimiento.
+- `README.md`: documentación del proyecto e instrucciones para su ejecución.
+
+## 4. Modelo de datos
 
 La base de datos está compuesta por tres tablas principales: `clientes`, `producto` y `ventas`.
 
@@ -25,19 +33,18 @@ Almacena la información de los clientes.
 | Campo | Tipo de dato | Descripción |
 |---|---|---|
 | `clientes_id` | SERIAL | Identificador único y clave primaria. |
-| `email` | VARCHAR(40) | Correo electrónico único y obligatorio. |
-| `edad` | INT | Edad del cliente, debe ser mayor que cero. |
+| `email` | VARCHAR(40) | Correo electrónico obligatorio y único. |
+| `edad` | INT | Edad del cliente. |
 
-**Restricciones aplicadas:**
-
+Restricciones:
 - `PRIMARY KEY`: identifica de forma única a cada cliente.
-- `UNIQUE`: evita que se repitan los correos electrónicos.
+- `UNIQUE`: impide que se repitan los correos electrónicos.
 - `NOT NULL`: exige que el email y la edad tengan un valor.
-- `CHECK (edad > 0)`: impide registrar edades iguales o inferiores a cero.
+- `CHECK (edad > 0)`: garantiza que la edad sea mayor que cero.
 
 ### Tabla `producto`
 
-Almacena la información de los productos disponibles.
+Almacena los productos disponibles.
 
 | Campo | Tipo de dato | Descripción |
 |---|---|---|
@@ -45,99 +52,127 @@ Almacena la información de los productos disponibles.
 | `stock` | INT | Cantidad disponible del producto. |
 | `precio_producto` | DECIMAL(8,2) | Precio del producto con dos decimales. |
 
-**Restricciones aplicadas:**
-
+Restricciones:
 - `PRIMARY KEY`: identifica de forma única a cada producto.
 - `NOT NULL`: exige que el stock y el precio tengan un valor.
-- `CHECK (stock >= 0)`: permite stock cero, pero no valores negativos.
-- `CHECK (precio_producto > 0)`: exige que el precio sea mayor que cero.
+- `CHECK (stock >= 0)`: impide que el stock sea negativo.
+- `CHECK (precio_producto > 0)`: impide registrar precios iguales o inferiores a cero.
 
 ### Tabla `ventas`
 
-Registra las ventas realizadas y relaciona clientes con productos.
+Registra las ventas realizadas y establece las relaciones entre clientes y productos.
 
 | Campo | Tipo de dato | Descripción |
 |---|---|---|
 | `ventas_id` | SERIAL | Identificador único y clave primaria. |
 | `clientes_id` | INT | Identificador del cliente asociado a la venta. |
 | `producto_id` | INT | Identificador del producto vendido. |
+| `cantidad` | INT | Cantidad de unidades vendidas. |
 
-**Restricciones aplicadas:**
-
+Restricciones:
 - `PRIMARY KEY`: identifica cada venta.
 - `FOREIGN KEY`: relaciona cada venta con un cliente existente.
 - `FOREIGN KEY`: relaciona cada venta con un producto existente.
-- `NOT NULL`: exige que ambas relaciones tengan un valor.
+- `CHECK (cantidad > 0)`: garantiza que la cantidad vendida sea mayor que cero.
 
-Las claves foráneas garantizan que las ventas no hagan referencia a clientes o productos inexistentes.
+Las claves foráneas mantienen la integridad referencial entre las tablas.
 
-## 4. Orden de creación de las tablas
+## 5. Cómo crear la base de datos y ejecutar el proyecto
 
-Las tablas se crean en el siguiente orden:
+La creación de la base de datos y la ejecución del script se realizan por separado.
 
-1. `clientes`
-2. `producto`
-3. `ventas`
+### Paso 1. Instalar PostgreSQL y pgAdmin
 
-Este orden permite crear primero las tablas que contienen los datos principales y luego establecer las relaciones mediante claves foráneas en la tabla `ventas`.
+Instalar PostgreSQL, que incluye el sistema gestor de bases de datos, y utilizar pgAdmin 4 para administrar la instancia y ejecutar las consultas.
 
-Al comienzo del script se utilizan sentencias `DROP TABLE IF EXISTS` para eliminar las tablas existentes antes de volver a crearlas.
+### Paso 2. Crear la base de datos
 
-**Importante:** esto elimina los datos anteriores de esas tablas. Se recomienda ejecutar el script en una base de datos de prueba.
+1. Abrir pgAdmin 4 y conectarse al servidor PostgreSQL.
+2. En el panel izquierdo, hacer clic derecho sobre **Databases**.
+3. Seleccionar **Create → Database**.
+4. Ingresar el nombre `proyecto_retail`.
+5. Guardar los cambios.
 
-## 5. Carga inicial de datos (DML)
+La base de datos se crea desde pgAdmin y no forma parte del archivo `retail.sql`.
 
-El script incorpora cinco registros iniciales en cada tabla.
+### Paso 3. Abrir el editor SQL
 
-Las operaciones de inserción se agrupan dentro de una transacción explícita mediante `BEGIN` y `COMMIT`.
+1. Seleccionar la base de datos `proyecto_retail`.
+2. Abrir **Tools → Query Tool**, o utilizar la opción equivalente disponible en la versión instalada.
+3. Abrir el archivo `retail.sql` desde el editor SQL.
+
+### Paso 4. Ejecutar el script
+
+Ejecutar el contenido completo del archivo `retail.sql`.
+
+El script crea las tablas, establece las restricciones de integridad, inserta los registros iniciales y realiza las operaciones de actualización y eliminación previstas.
+
+**Importante:** el script comienza con sentencias `DROP TABLE IF EXISTS`, por lo que elimina las tablas existentes con esos nombres antes de volver a crearlas. Esto puede provocar la pérdida de datos anteriores. Se recomienda ejecutarlo en una base de datos de prueba.
+
+### Paso 5. Verificar los resultados
+
+Al finalizar la ejecución, consultar las tablas mediante las siguientes instrucciones:
+
+```sql
+SELECT * FROM clientes;
+SELECT * FROM producto;
+SELECT * FROM ventas;
+```
+
+Estas consultas permiten comprobar los registros existentes en cada tabla.
+
+## 6. Carga inicial de datos y transacciones
+
+El script inserta cinco registros iniciales en cada tabla.
+
+Las inserciones se agrupan dentro de una transacción explícita mediante `BEGIN` y `COMMIT`.
 
 - `BEGIN`: inicia la transacción.
-- `INSERT INTO`: agrega los registros a cada tabla.
-- `COMMIT`: confirma los cambios realizados durante la transacción.
+- `INSERT INTO`: agrega registros a las tablas.
+- `COMMIT`: confirma los cambios realizados en la transacción.
 
-Este mecanismo permite agrupar las inserciones para que se confirmen conjuntamente si todas las operaciones se ejecutan correctamente.
+Este mecanismo permite confirmar conjuntamente las inserciones cuando todas las operaciones se ejecutan correctamente.
 
 Los identificadores se generan automáticamente mediante el tipo `SERIAL`.
 
-## 6. Actualización masiva de precios
+## 7. Actualización masiva de precios
 
-Se utiliza una sentencia `UPDATE` para aumentar un 10 % el precio de los productos cuyos identificadores son 1, 2 y 3.
+El script utiliza una sentencia `UPDATE` para aumentar un 10 % el precio de los productos identificados con los IDs 1, 2 y 3.
 
-Antes de realizar la modificación, se ejecuta un `SELECT` para consultar los registros afectados.
+Antes de realizar la actualización, se ejecuta una consulta `SELECT` para revisar los productos afectados.
 
-La cláusula `WHERE` limita la actualización a los productos seleccionados y evita modificar los precios de toda la tabla.
+La cláusula `WHERE` limita la modificación a los registros seleccionados y evita actualizar todos los productos de la tabla.
 
-## 7. Eliminación de un registro de prueba
+## 8. Eliminación de un registro de prueba
 
-El script agrega un cliente de prueba con el correo `prueba@gmail.com`.
+Para comprobar el funcionamiento de `DELETE`, el script inserta un cliente de prueba con el correo `prueba@gmail.com`.
 
-Antes de eliminarlo, se ejecuta una consulta `SELECT` para verificar que el registro exista.
+A continuación, realiza una consulta `SELECT` para verificar su existencia y lo elimina mediante una sentencia `DELETE` con una condición `WHERE` basada en el correo electrónico.
 
-Posteriormente, se utiliza `DELETE` con una cláusula `WHERE` basada en el email para eliminar únicamente ese cliente de prueba.
+De esta manera, se elimina únicamente el registro de prueba y se conservan los demás clientes.
 
-De esta manera, se evita borrar accidentalmente el resto de los registros.
+## 9. Restricciones de integridad implementadas
 
-## 8. Cómo ejecutar el proyecto
+El proyecto utiliza diferentes restricciones para proteger la consistencia de los datos:
 
-1. Instalar PostgreSQL y disponer de una base de datos de prueba.
-2. Abrir pgAdmin o una herramienta compatible con PostgreSQL.
-3. Seleccionar la base de datos donde se ejecutará el proyecto.
-4. Abrir el archivo `retail.sql` en el editor de consultas.
-5. Ejecutar el script completo.
-6. Revisar los mensajes de ejecución para detectar posibles errores.
-7. Consultar los registros con sentencias `SELECT` para verificar los resultados.
+- **PRIMARY KEY:** identifica de manera única los registros.
+- **FOREIGN KEY:** garantiza que las relaciones entre ventas, clientes y productos sean válidas.
+- **UNIQUE:** evita correos electrónicos duplicados.
+- **NOT NULL:** impide valores nulos en campos obligatorios.
+- **CHECK:** valida condiciones para edad, precio, stock y cantidad vendida.
 
-## 9. Objetivos cumplidos
+## 10. Objetivos cumplidos
 
-- Creación de las tres tablas principales del sistema retail.
+- Creación de las tablas principales del sistema retail.
 - Definición de claves primarias y foráneas.
-- Implementación de restricciones de integridad mediante `CHECK`, `UNIQUE` y `NOT NULL`.
-- Uso de tipos de datos apropiados para identificadores, texto, precios y cantidades.
-- Inserción de datos iniciales mediante una transacción.
+- Implementación de restricciones de integridad.
+- Uso de tipos de datos adecuados.
+- Inserción de datos iniciales mediante una transacción explícita.
 - Actualización selectiva de precios mediante `UPDATE`.
 - Eliminación controlada de un registro de prueba mediante `DELETE`.
-- Verificación de los datos antes de realizar modificaciones.
+- Verificación de los registros mediante consultas `SELECT`.
+- Documentación del procedimiento de instalación y ejecución.
 
-## 10. Autor
+## 11. Autor
 
 Proyecto desarrollado como parte de una práctica de SQL y bases de datos relacionales.
